@@ -16,10 +16,6 @@ public class DangerMob extends Mob {
         return this.dangerZones;
     }
 
-    public boolean hasDangerZones() {
-        return this.dangerZones.size() > 0;
-    }
-
     protected void setDirectDangerZones() {
         if (super.coords.x + 1 < 9) this.dangerZones.add(new Coord(super.coords.x+1, super.coords.y));
         if (super.coords.x - 1 > 0) this.dangerZones.add(new Coord(super.coords.x-1, super.coords.y));

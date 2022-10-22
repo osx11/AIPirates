@@ -1,6 +1,7 @@
 package me.osx11.assignment1;
 
 import me.osx11.assignment1.a_star.Node;
+import me.osx11.assignment1.mobs.Kraken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class CaribbeanMap {
     public CaribbeanMap(Mob jack, Mob chest, Mob tortuga, DangerMob davy, DangerMob kraken, DangerMob rock, Node start, Node end) {
         for (int y = 0; y < 9; y++) {
             for (int x = 0; x < 9; x++) {
-                this.map[y][x] = (MapSymbol.FREE.symbol);
+                this.setMapCell(x, y, MapSymbol.FREE);
             }
         }
 
@@ -45,14 +46,10 @@ public class CaribbeanMap {
         this.end = end;
     }
 
-//    public void removeKraken() {
-//        this.map[kraken[1]][kraken[0]] = Main.FREE;
-//
-//        try {this.map[kraken[1]-1][kraken[0]] = Main.FREE;} catch (Exception e) {}
-//        try {this.map[kraken[1]+1][kraken[0]] = Main.FREE;} catch (Exception e) {}
-//        try {this.map[kraken[1]][kraken[0]-1] = Main.FREE;} catch (Exception e) {}
-//        try {this.map[kraken[1]][kraken[0]+1] = Main.FREE;} catch (Exception e) {}
-//    }
+    public void removeKraken() {
+        DangerMob kraken = dangerMobs.stream().filter(mob -> mob instanceof Kraken).findFirst().get();
+        this.freeMob(kraken);
+    }
 
     public void print() {
         System.out.println("  | 0 1 2 3 4 5 6 7 8");
@@ -60,22 +57,62 @@ public class CaribbeanMap {
         for (int y = 0; y < 9; y++) {
             System.out.print(y + " | ");
             for (int x = 0; x < 9; x++) {
-                System.out.print(this.map[y][x] + " ");
+                System.out.print(this.getMapCell(x, y) + " ");
             }
             System.out.println();
         }
     }
 
     private void fillMob(Mob mob) {
-        this.map[mob.coords.y][mob.coords.x] = mob.icon;
+        this.setMapCell(mob);
 
         if (mob instanceof DangerMob) {
-            this.fillDangers((DangerMob) mob);
+            this.fillDangerZones((DangerMob) mob);
         }
     }
 
-    private void fillDangers(DangerMob danger) {
-        if (!danger.hasDangerZones()) return;
-        danger.getDangerZones().forEach(coord -> this.map[coord.y][coord.x] = MapSymbol.DANGER_ZONE.symbol);
+    private void freeMob(Mob mob) {
+        if (this.getMapCell(mob) == mob.icon)
+            this.setMapCell(mob, MapSymbol.FREE);
+
+        if (mob instanceof DangerMob) {
+            this.freeDangerZones((DangerMob) mob);
+        }
+    }
+
+    private void fillDangerZones(DangerMob mob) {
+        mob.getDangerZones().forEach(coord -> this.setMapCell(coord.x, coord.y, MapSymbol.DANGER_ZONE));
+    }
+
+    private void freeDangerZones(DangerMob mob) {
+        mob.getDangerZones().forEach(coord -> {
+            if (this.getMapCell(coord.x, coord.y) == MapSymbol.DANGER_ZONE.symbol) {
+                this.setMapCell(coord.x, coord.y, MapSymbol.FREE);
+            }
+        });
+    }
+
+    private char getMapCell(int x, int y) {
+        return this.map[y][x];
+    }
+
+    private char getMapCell(Mob mob) {
+        return this.getMapCell(mob.coords.x, mob.coords.y);
+    }
+
+    private void setMapCell(int x, int y, MapSymbol symbol) {
+        this.map[y][x] = symbol.symbol;
+    }
+
+    private void setMapCell(int x, int y, char symbol) {
+        this.map[y][x] = symbol;
+    }
+
+    private void setMapCell(Mob mob, MapSymbol symbol) {
+        this.setMapCell(mob.coords.x, mob.coords.y, symbol);
+    }
+
+    private void setMapCell(Mob mob) {
+        this.setMapCell(mob.coords.x, mob.coords.y, mob.icon);
     }
 }

@@ -58,13 +58,14 @@ public class Main {
             map.start = new Node(tortuga[0], tortuga[1]);
             map.end = new Node(chest[0], chest[1]);
             map.gainedRum = true;
-//            map.removeKraken();
 
             openList = new PriorityQueue<>();
             closeList = new ArrayList<>();
 
             result = Utils.start(closeList, openList, map);
             recalculateFinalCost();
+
+            map.removeKraken();
 
             if (!result) {
                 System.out.println("LOSE (reached Tortuga and tried to kill Kraken, but something still blocks the chest)");
