@@ -112,12 +112,17 @@ public class CaribbeanMap {
     }
 
     private void fillDangerZones(DangerMob mob) {
-        mob.getDangerZones().forEach(coord -> this.setMapCell(coord.x, coord.y, MapSymbol.DANGER_ZONE));
+        mob.dangerZones.forEach(coord -> this.setMapCell(coord.x, coord.y, MapSymbol.DANGER_ZONE));
     }
 
     private void freeDangerZones(DangerMob mob) {
-        mob.getDangerZones().forEach(coord -> {
-            if (this.getMapCell(coord.x, coord.y) == MapSymbol.DANGER_ZONE.symbol) {
+        mob.dangerZones.forEach(coord -> {
+            boolean cellCanBeCleared = dangerMobs
+                    .stream()
+                    .filter(dangerMob -> dangerMob != mob)
+                    .allMatch(dangerMob -> dangerMob.dangerZones.stream().noneMatch(anotherCoord -> anotherCoord.equals(coord)));
+
+            if (this.getMapCell(coord.x, coord.y) == MapSymbol.DANGER_ZONE.symbol && cellCanBeCleared) {
                 this.setMapCell(coord.x, coord.y, MapSymbol.FREE);
             }
         });
