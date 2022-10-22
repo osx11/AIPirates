@@ -3,7 +3,6 @@ package me.osx11.assignment1.a_star;
 import me.osx11.assignment1.CaribbeanMap;
 import me.osx11.assignment1.Main;
 import me.osx11.assignment1.MapSymbol;
-import me.osx11.assignment1.mobs.Kraken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,20 +10,16 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class AStar {
-    private int finalCost = 0;
-    private Queue<Node> openList;
-    private List<Node> closeList;
-    private CaribbeanMap caribbeanMap;
+    private int finalCost;
+    private final Queue<Node> openList;
+    private final List<Node> closeList;
+    private final CaribbeanMap caribbeanMap;
 
     public AStar(CaribbeanMap caribbeanMap) {
-        this.reset();
-        this.caribbeanMap = caribbeanMap;
-    }
-
-    public void reset() {
         this.openList = new PriorityQueue<>();
         this.closeList = new ArrayList<>();
         this.finalCost = 0;
+        this.caribbeanMap = caribbeanMap;
     }
 
     public int getFinalCost() { return finalCost; }
@@ -45,10 +40,11 @@ public class AStar {
 
         char currentCell = this.caribbeanMap.map[y][x];
 
-        if (this.caribbeanMap.dangerMobs.stream().anyMatch(mob -> {
-            if (mob instanceof Kraken) return mob.icon == currentCell && !this.caribbeanMap.gainedRum;
-            return currentCell == mob.icon || currentCell == MapSymbol.DANGER_ZONE.symbol;
-        })) return false;
+        boolean dangerInCell = this.caribbeanMap.dangerMobs
+                .stream()
+                .anyMatch(mob -> currentCell == mob.icon || currentCell == MapSymbol.DANGER_ZONE.symbol);
+
+        if (dangerInCell) return false;
 
         // Determine whether the node has a close table
         if (isCoordInClose(x, y)) return false;

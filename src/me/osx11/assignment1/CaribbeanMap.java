@@ -1,27 +1,32 @@
 package me.osx11.assignment1;
 
 import me.osx11.assignment1.a_star.Node;
-import me.osx11.assignment1.mobs.Kraken;
+import me.osx11.assignment1.mobs.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CaribbeanMap {
     public static final int WIDTH = 9; // width of the me.osx11.assignment1.map
     public static final int HEIGHT = 9; // The height of the me.osx11.assignment1.map
 
-    public final char[][] map = new char[9][9];
+    public char[][] map;
 
     public Node start;
     public Node end;
-    public boolean gainedRum = false;
 
-    public final Mob jack;
-    public final Mob chest;
-    public final Mob tortuga;
+    public final Jack jack;
+    public final Chest chest;
+    public final Tortuga tortuga;
+    public final Davy davy;
+    public final Kraken kraken;
+    public final Rock rock;
     public final List<DangerMob> dangerMobs = new ArrayList<>();
 
-    public CaribbeanMap(Mob jack, Mob chest, Mob tortuga, DangerMob davy, DangerMob kraken, DangerMob rock, Node start, Node end) {
+    public CaribbeanMap(Jack jack, Chest chest, Tortuga tortuga, Davy davy, Kraken kraken, Rock rock, Node start, Node end) {
+        this.map = new char[9][9];
+
         for (int y = 0; y < 9; y++) {
             for (int x = 0; x < 9; x++) {
                 this.setMapCell(x, y, MapSymbol.FREE);
@@ -31,6 +36,9 @@ public class CaribbeanMap {
         this.jack = jack;
         this.chest = chest;
         this.tortuga = tortuga;
+        this.davy = davy;
+        this.kraken = kraken;
+        this.rock = rock;
 
         this.dangerMobs.add(davy);
         this.dangerMobs.add(kraken);
@@ -44,6 +52,29 @@ public class CaribbeanMap {
 
         this.start = start;
         this.end = end;
+    }
+
+    public CaribbeanMap(CaribbeanMap caribbeanMap) {
+        this(
+                caribbeanMap.jack,
+                caribbeanMap.chest,
+                caribbeanMap.tortuga,
+                caribbeanMap.davy,
+                caribbeanMap.kraken,
+                caribbeanMap.rock,
+                new Node(caribbeanMap.start.coord.x, caribbeanMap.start.coord.y),
+                new Node(caribbeanMap.end.coord.x, caribbeanMap.end.coord.y)
+        );
+
+        for (int i = 0; i < caribbeanMap.map.length; i++)
+            for (int j = 0; j < caribbeanMap.map[i].length; j++)
+                this.map[i][j] = caribbeanMap.map[i][j];
+    }
+
+    public void setMap(char[][] map) {
+        for (int i = 0; i < map.length; i++)
+            for (int j = 0; j < map[i].length; j++)
+                this.map[i][j] = map[i][j];
     }
 
     public void removeKraken() {
