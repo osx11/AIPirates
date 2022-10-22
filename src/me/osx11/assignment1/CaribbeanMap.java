@@ -120,7 +120,11 @@ public class CaribbeanMap {
             boolean cellCanBeCleared = dangerMobs
                     .stream()
                     .filter(dangerMob -> dangerMob != mob)
-                    .allMatch(dangerMob -> dangerMob.dangerZones.stream().noneMatch(anotherCoord -> anotherCoord.equals(coord)));
+                    .allMatch(dangerMob -> {
+                        return dangerMob.dangerZones
+                                .stream()
+                                .noneMatch(anotherCoord -> anotherCoord.equals(coord));
+                    });
 
             if (this.getMapCell(coord.x, coord.y) == MapSymbol.DANGER_ZONE.symbol && cellCanBeCleared) {
                 this.setMapCell(coord.x, coord.y, MapSymbol.FREE);
