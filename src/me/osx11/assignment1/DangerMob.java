@@ -18,22 +18,22 @@ public class DangerMob extends Mob {
 
     protected void setDirectDangerZones() {
         if (super.coords.x + 1 < 9) this.dangerZones.add(new Coord(super.coords.x+1, super.coords.y));
-        if (super.coords.x - 1 > 0) this.dangerZones.add(new Coord(super.coords.x-1, super.coords.y));
+        if (super.coords.x - 1 >= 0) this.dangerZones.add(new Coord(super.coords.x-1, super.coords.y));
         if (super.coords.y + 1 < 9) this.dangerZones.add(new Coord(super.coords.x, super.coords.y+1));
-        if (super.coords.y - 1 > 0) this.dangerZones.add(new Coord(super.coords.x, super.coords.y-1));
+        if (super.coords.y - 1 >= 0) this.dangerZones.add(new Coord(super.coords.x, super.coords.y-1));
     }
 
     protected void setDiagonalDangerZones() {
-        if (super.coords.x - 1 > 0 && super.coords.y + 1 < 9)
+        if (super.coords.x - 1 >= 0 && super.coords.y + 1 < 9)
             this.dangerZones.add(new Coord(super.coords.x-1, super.coords.y+1));
 
-        if (super.coords.x - 1 > 0 && super.coords.y - 1 > 0)
+        if (super.coords.x - 1 >= 0 && super.coords.y - 1 >= 0)
             this.dangerZones.add(new Coord(super.coords.x-1, super.coords.y-1));
 
         if (super.coords.x + 1 < 9 && super.coords.y + 1 < 9)
             this.dangerZones.add(new Coord(super.coords.x+1, super.coords.y+1));
 
-        if (super.coords.x + 1 < 9 && super.coords.y - 1 > 0)
+        if (super.coords.x + 1 < 9 && super.coords.y - 1 >= 0)
             this.dangerZones.add(new Coord(super.coords.x+1, super.coords.y-1));
     }
 }

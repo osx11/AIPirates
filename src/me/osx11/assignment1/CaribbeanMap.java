@@ -53,7 +53,7 @@ public class CaribbeanMap {
 
     public void print() {
         System.out.println("  | 0 1 2 3 4 5 6 7 8");
-        System.out.println("--|------------------");
+        System.out.println("——|——————————————————");
         for (int y = 0; y < 9; y++) {
             System.out.print(y + " | ");
             for (int x = 0; x < 9; x++) {

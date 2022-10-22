@@ -33,7 +33,7 @@ public class AStar {
      * Determine whether the node is the final node
      */
     public boolean isEndNode(Coord end, Coord coord) {
-        return coord != null && end.equals(coord);
+        return end.equals(coord);
     }
 
     /**
