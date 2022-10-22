@@ -1,10 +1,8 @@
 package me.osx11.assignment1;
 
 import me.osx11.assignment1.a_star.Node;
-import me.osx11.assignment1.a_star.Utils;
+import me.osx11.assignment1.a_star.AStar;
 import me.osx11.assignment1.mobs.*;
-
-import java.util.*;
 
 public class Main {
     private static final int[] jack = {0, 2};
@@ -34,18 +32,15 @@ public class Main {
         map.print();
         System.out.println();
 
-        Queue<Node> openList = new PriorityQueue<>();
-        List<Node> closeList = new ArrayList<>();
-
-        boolean result = Utils.start(closeList, openList, map);
-        recalculateFinalCost();
+        AStar aStar = new AStar(map);
+        boolean result = aStar.start();
+        recalculateFinalCost(aStar.getFinalCost());
 
         if (!result) {
             map.end = new Node(tortuga[0], tortuga[1]);
 
-            openList = new PriorityQueue<>();
-            closeList = new ArrayList<>();
-            result = Utils.start(closeList, openList, map);
+            aStar.reset();
+            result = aStar.start();
 
             if (!result) {
                 System.out.println("LOSE (Tortuga unreachable)");
@@ -53,17 +48,15 @@ public class Main {
                 return;
             }
 
-            recalculateFinalCost();
+            recalculateFinalCost(aStar.getFinalCost());
 
             map.start = new Node(tortuga[0], tortuga[1]);
             map.end = new Node(chest[0], chest[1]);
             map.gainedRum = true;
 
-            openList = new PriorityQueue<>();
-            closeList = new ArrayList<>();
-
-            result = Utils.start(closeList, openList, map);
-            recalculateFinalCost();
+            aStar.reset();
+            result = aStar.start();
+            recalculateFinalCost(aStar.getFinalCost());
 
             map.removeKraken();
 
@@ -76,8 +69,7 @@ public class Main {
         map.print();
     }
 
-    private static void recalculateFinalCost() {
-        int newCost = Utils.getFinalCost();
+    private static void recalculateFinalCost(int newCost) {
         if (newCost != Integer.MAX_VALUE) finalCost += newCost;
     }
 }
