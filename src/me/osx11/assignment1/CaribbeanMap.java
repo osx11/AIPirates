@@ -4,7 +4,6 @@ import me.osx11.assignment1.a_star.Node;
 import me.osx11.assignment1.mobs.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CaribbeanMap {
@@ -25,10 +24,10 @@ public class CaribbeanMap {
     public final List<DangerMob> dangerMobs = new ArrayList<>();
 
     public CaribbeanMap(Jack jack, Chest chest, Tortuga tortuga, Davy davy, Kraken kraken, Rock rock, Node start, Node end) {
-        this.map = new char[9][9];
+        this.map = new char[CaribbeanMap.HEIGHT][CaribbeanMap.WIDTH];
 
-        for (int y = 0; y < 9; y++) {
-            for (int x = 0; x < 9; x++) {
+        for (int y = 0; y < CaribbeanMap.HEIGHT; y++) {
+            for (int x = 0; x < CaribbeanMap.WIDTH; x++) {
                 this.setMapCell(x, y, MapSymbol.FREE);
             }
         }
@@ -85,9 +84,9 @@ public class CaribbeanMap {
     public void print() {
         System.out.println("  | 0 1 2 3 4 5 6 7 8");
         System.out.println("——|——————————————————");
-        for (int y = 0; y < 9; y++) {
+        for (int y = 0; y < CaribbeanMap.HEIGHT; y++) {
             System.out.print(y + " | ");
-            for (int x = 0; x < 9; x++) {
+            for (int x = 0; x < CaribbeanMap.WIDTH; x++) {
                 System.out.print(this.getMapCell(x, y) + " ");
             }
             System.out.println();

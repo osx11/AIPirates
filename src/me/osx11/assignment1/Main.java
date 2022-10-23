@@ -3,23 +3,23 @@ package me.osx11.assignment1;
 import me.osx11.assignment1.a_star.Coord;
 import me.osx11.assignment1.a_star.Node;
 import me.osx11.assignment1.a_star.AStar;
+import me.osx11.assignment1.backtracking.Backtracking;
 import me.osx11.assignment1.mobs.*;
 
 public class Main {
+    private static final Algorithm algorithm = new Backtracking();
+
     private static final int[] jack = {0, 0};
     private static final int[] davy = {6, 6};
     private static final int[] kraken = {7, 1};
     private static final int[] rock = {8, 7};
-    private static final int[] chest = {8, 0};
+    private static final int[] chest = {6, 0};
     private static final int[] tortuga = {8, 8};
-
-    public static final int DIRECT_COST = 1; // horizontal and vertical movement cost
-    public static final int DIAGONAL_COST = 1; // diagonal movement cost
 
     private static int finalCost;
 
     public static void main(String[] args) {
-        CaribbeanMap map = new CaribbeanMap(
+        CaribbeanMap caribbeanMap = new CaribbeanMap(
                 new Jack(jack[0], jack[1]),
                 new Chest(chest[0], chest[1]),
                 new Tortuga(tortuga[0], tortuga[1]),
@@ -30,27 +30,29 @@ public class Main {
                 new Node(chest[0], chest[1])
         );
 
-        map.print();
+        algorithm.setMap(caribbeanMap);
+        caribbeanMap.print();
         System.out.println();
 
-        AStar aStar = new AStar(map);
-        boolean result = aStar.start();
-        recalculateFinalCost(aStar.getFinalCost());
+//        boolean result = algorithm.solve();
+//        recalculateFinalCost(algorithm.getFinalCost());
+
+        boolean result = false;
 
         if (!result) {
             System.out.println("Chest is blocked. Trying to get to Tortuga first");
-            map.end = new Node(tortuga[0], tortuga[1]);
+            caribbeanMap.end = new Node(tortuga[0], tortuga[1]);
 
-            result = aStar.start();
+            result = algorithm.solve();
 
             if (!result) {
                 System.out.println("LOSE (Tortuga unreachable)");
-                map.print();
+                caribbeanMap.print();
                 return;
             }
 
-            recalculateFinalCost(aStar.getFinalCost());
-            int tortugaToChestCost = findLeastKrakenKillPath(map);
+            recalculateFinalCost(algorithm.getFinalCost());
+            int tortugaToChestCost = findLeastKrakenKillPath(caribbeanMap);
 
             if (tortugaToChestCost < Integer.MAX_VALUE) {
                 System.out.println("Kraken was killed. Going to chest");
@@ -67,7 +69,7 @@ public class Main {
         System.out.println("If the route passes through mob, obstacle, etc., this object is replaced by @");
         System.out.println("If Kraken was killed, it and it's danger zones are removed from map");
         System.out.println();
-        map.print();
+        caribbeanMap.print();
     }
 
     private static int findLeastKrakenKillPath(CaribbeanMap caribbeanMap) {
@@ -88,20 +90,20 @@ public class Main {
             mapCopy.start = new Node(tortuga[0], tortuga[1]);
             mapCopy.end = possibleEnds[i];
 
-            AStar aStar = new AStar(mapCopy);
-            boolean result = aStar.start();
+            algorithm.setMap(mapCopy);
+            boolean result = algorithm.solve();
 
             if (result) {
-                int cost = aStar.getFinalCost();
+                int cost = algorithm.getFinalCost();
 
                 mapCopy.start = new Node(possibleEnds[i].coord.x, possibleEnds[i].coord.y);
                 mapCopy.end = new Node(chest[0], chest[1]);
                 mapCopy.removeKraken();
 
-                result = aStar.start();
+                result = algorithm.solve();
 
                 if (result) {
-                    cost += aStar.getFinalCost();
+                    cost += algorithm.getFinalCost();
 
                     if (cost < leastCost) {
                         leastCost = cost;
@@ -116,6 +118,8 @@ public class Main {
 
         if (leastCost < Integer.MAX_VALUE) {
             caribbeanMap.setMap(leastCostMap);
+        } else {
+            System.out.println("CHEST UNREACHABLE");
         }
 
         return leastCost;

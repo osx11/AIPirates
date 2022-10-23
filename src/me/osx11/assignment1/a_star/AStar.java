@@ -1,5 +1,6 @@
 package me.osx11.assignment1.a_star;
 
+import me.osx11.assignment1.Algorithm;
 import me.osx11.assignment1.CaribbeanMap;
 import me.osx11.assignment1.Main;
 import me.osx11.assignment1.MapSymbol;
@@ -9,16 +10,19 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-public class AStar {
+public class AStar implements Algorithm {
     private int finalCost;
     private final Queue<Node> openList;
     private final List<Node> closeList;
-    private final CaribbeanMap caribbeanMap;
+    private CaribbeanMap caribbeanMap;
 
-    public AStar(CaribbeanMap caribbeanMap) {
+    public AStar() {
         this.openList = new PriorityQueue<>();
         this.closeList = new ArrayList<>();
         this.finalCost = 0;
+    }
+
+    public void setMap(CaribbeanMap caribbeanMap) {
         this.caribbeanMap = caribbeanMap;
     }
 
@@ -99,32 +103,32 @@ public class AStar {
         int x = current.coord.x;
         int y = current.coord.y;
         // left
-        addNeighborNodeInOpen(current, x - 1, y, Main.DIRECT_COST);
+        addNeighborNodeInOpen(current, x - 1, y);
         // up
-        addNeighborNodeInOpen(current, x, y - 1, Main.DIRECT_COST);
+        addNeighborNodeInOpen(current, x, y - 1);
         // right
-        addNeighborNodeInOpen(current, x + 1, y, Main.DIRECT_COST);
+        addNeighborNodeInOpen(current, x + 1, y);
         // down
-        addNeighborNodeInOpen(current, x, y + 1, Main.DIRECT_COST);
+        addNeighborNodeInOpen(current, x, y + 1);
         // top left
-        addNeighborNodeInOpen(current, x - 1, y - 1, Main.DIAGONAL_COST);
+        addNeighborNodeInOpen(current, x - 1, y - 1);
         // top right
-        addNeighborNodeInOpen(current, x + 1, y - 1, Main.DIAGONAL_COST);
+        addNeighborNodeInOpen(current, x + 1, y - 1);
         // bottom right
-        addNeighborNodeInOpen(current, x + 1, y + 1, Main.DIAGONAL_COST);
+        addNeighborNodeInOpen(current, x + 1, y + 1);
         // bottom left
-        addNeighborNodeInOpen(current, x - 1, y + 1, Main.DIAGONAL_COST);
+        addNeighborNodeInOpen(current, x - 1, y + 1);
     }
 
     /**
      * Add a neighbor node to the open table
      */
-    public void addNeighborNodeInOpen(Node current, int x, int y, int value) {
+    public void addNeighborNodeInOpen(Node current, int x, int y) {
         if (canAddNodeToOpen(x, y))
         {
             Node end = this.caribbeanMap.end;
             Coord coord = new Coord(x, y);
-            int G = current.G + value; // Calculate the G value of the adjacent node
+            int G = current.G + 1; // Calculate the G value of the adjacent node
             Node child = findNodeInOpen(coord);
             if (child == null)
             {
@@ -165,7 +169,7 @@ public class AStar {
         }
     }
 
-    public boolean start() {
+    public boolean solve() {
         finalCost = 0;
 
         // clean
