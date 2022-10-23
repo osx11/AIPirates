@@ -94,7 +94,7 @@ public class CaribbeanMap {
         }
     }
 
-    private void fillMob(Mob mob) {
+    public void fillMob(Mob mob) {
         this.setMapCell(mob);
 
         if (mob instanceof DangerMob) {

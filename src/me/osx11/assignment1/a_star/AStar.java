@@ -160,7 +160,7 @@ public class AStar {
         while (end != null)
         {
             Coord c = end.coord;
-            maps[c.y][c.x] = MapSymbol.PATH.symbol;
+            if (maps[c.y][c.x] != MapSymbol.JACK.symbol) maps[c.y][c.x] = MapSymbol.PATH.symbol;
             end = end.parent;
         }
     }

@@ -6,12 +6,12 @@ import me.osx11.assignment1.a_star.AStar;
 import me.osx11.assignment1.mobs.*;
 
 public class Main {
-    private static final int[] jack = {1, 1};
-    private static final int[] davy = {6, 7};
-    private static final int[] kraken = {8, 6};
-    private static final int[] rock = {8, 4};
-    private static final int[] chest = {8, 8};
-    private static final int[] tortuga = {0, 6};
+    private static final int[] jack = {0, 0};
+    private static final int[] davy = {6, 6};
+    private static final int[] kraken = {7, 1};
+    private static final int[] rock = {8, 7};
+    private static final int[] chest = {8, 0};
+    private static final int[] tortuga = {8, 8};
 
     public static final int DIRECT_COST = 1; // horizontal and vertical movement cost
     public static final int DIAGONAL_COST = 1; // diagonal movement cost
@@ -50,32 +50,27 @@ public class Main {
             }
 
             recalculateFinalCost(aStar.getFinalCost());
+            int tortugaToChestCost = findLeastKrakenKillPath(map);
 
-            Pair<Node, Integer> leastCostKrakenKill = findLeastKrakenKillPath(map);
-            recalculateFinalCost(leastCostKrakenKill.t2);
-
-            if (leastCostKrakenKill.t1 == null) {
-                System.out.println("LOSE (Cannot kill Kraken)");
+            if (tortugaToChestCost < Integer.MAX_VALUE) {
+                System.out.println("Kraken was killed. Going to chest");
+                recalculateFinalCost(tortugaToChestCost);
+            } else {
+                System.out.println("Cannot kill Kraken or reach chest after it");
                 return;
-            }
-
-            map.start = new Node(leastCostKrakenKill.t1.coord.x, leastCostKrakenKill.t1.coord.y);
-            map.end = new Node(chest[0], chest[1]);
-            map.removeKraken();
-
-            result = aStar.start();
-            recalculateFinalCost(aStar.getFinalCost());
-
-            if (!result) {
-                System.out.println("LOSE (reached Tortuga and tried to kill Kraken, but something still blocks the chest)");
             }
         }
 
-        System.out.println("Final cost " + finalCost + "\n");
+        System.out.println();
+        System.out.println("Final cost is " + finalCost);
+        System.out.println("Note: In the below map @ denotes the path.");
+        System.out.println("If the route passes through mob, obstacle, etc., this object is replaced by @");
+        System.out.println("If Kraken was killed, it and it's danger zones are removed from map");
+        System.out.println();
         map.print();
     }
 
-    private static Pair<Node, Integer> findLeastKrakenKillPath(CaribbeanMap caribbeanMap) {
+    private static int findLeastKrakenKillPath(CaribbeanMap caribbeanMap) {
         Node[] possibleEnds = {
                 new Node(kraken[0]+1, kraken[1]+1),
                 new Node(kraken[0]-1, kraken[1]-1),
@@ -84,7 +79,6 @@ public class Main {
         };
 
         int leastCost = Integer.MAX_VALUE;
-        Node leastCostNode = null;
         char[][] leastCostMap = new char[9][9];
 
         for (int i = 0; i < 4; i++) {
@@ -97,22 +91,34 @@ public class Main {
             AStar aStar = new AStar(mapCopy);
             boolean result = aStar.start();
 
-            if (result && aStar.getFinalCost() < leastCost) {
-                leastCost = aStar.getFinalCost();
-                leastCostNode = possibleEnds[i];
+            if (result) {
+                int cost = aStar.getFinalCost();
 
-                for (int j = 0; j < mapCopy.map.length; j++)
-                    for (int k = 0; k < mapCopy.map[j].length; k++)
-                        leastCostMap[j][k] = mapCopy.map[j][k];
+                mapCopy.start = new Node(possibleEnds[i].coord.x, possibleEnds[i].coord.y);
+                mapCopy.end = new Node(chest[0], chest[1]);
+                mapCopy.removeKraken();
+
+                result = aStar.start();
+
+                if (result) {
+                    cost += aStar.getFinalCost();
+
+                    if (cost < leastCost) {
+                        leastCost = cost;
+
+                        for (int j = 0; j < mapCopy.map.length; j++)
+                            for (int k = 0; k < mapCopy.map[j].length; k++)
+                                leastCostMap[j][k] = mapCopy.map[j][k];
+                    }
+                }
             }
         }
 
-        if (leastCostNode != null) {
+        if (leastCost < Integer.MAX_VALUE) {
             caribbeanMap.setMap(leastCostMap);
-            caribbeanMap.removeKraken();
         }
 
-        return new Pair<>(leastCostNode, leastCost);
+        return leastCost;
     }
 
     private static void recalculateFinalCost(int newCost) {
