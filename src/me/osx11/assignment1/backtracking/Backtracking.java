@@ -13,6 +13,7 @@ public class Backtracking implements Algorithm {
     private int leastCost = Integer.MAX_VALUE;
     private char[][] leastMap = new char[CaribbeanMap.HEIGHT][CaribbeanMap.WIDTH];
     private CaribbeanMap caribbeanMap;
+    private int step = 0;
 
     public Backtracking() {}
 
@@ -43,7 +44,11 @@ public class Backtracking implements Algorithm {
 
         boolean dangerInCell = this.caribbeanMap.dangerMobs
                 .stream()
-                .anyMatch(mob -> currentCell == mob.icon || currentCell == MapSymbol.DANGER_ZONE.symbol);
+                .anyMatch(mob -> currentCell == mob.icon) || currentCell == MapSymbol.DANGER_ZONE.symbol;
+
+        if (x == 5 && y == 7 && !dangerInCell) {
+//            this.caribbeanMap.print();
+        }
 
         return !dangerInCell;
     }
@@ -60,7 +65,7 @@ public class Backtracking implements Algorithm {
 
         char[][] sol = new char[CaribbeanMap.HEIGHT][CaribbeanMap.WIDTH];
 
-        if (!solveMazeUtil(0, 0, sol, signs)) {
+        if (!solveMazeUtil(this.caribbeanMap.start.coord.x, this.caribbeanMap.start.coord.y, sol, signs) || this.cost >= 25) {
             this.cost = Integer.MAX_VALUE;
             return null;
         }
@@ -71,7 +76,7 @@ public class Backtracking implements Algorithm {
     /* A recursive utility function to solve Maze
     problem */
     boolean solveMazeUtil(int x, int y, char[][] sol, Sign[][] signs) {
-        if (this.cost >= this.leastCost) return true;
+        if (this.cost >= this.leastCost || this.cost >= 25) return true;
 
         // if (x, y is goal) return true
         if (x == this.caribbeanMap.end.coord.x && y == this.caribbeanMap.end.coord.y) {
@@ -127,9 +132,10 @@ public class Backtracking implements Algorithm {
 
     public boolean solve() {
         // FIXME if uncomment it will crash
-//        this.cost = 0;
-//        this.leastCost = Integer.MAX_VALUE;
-//        this.leastMap = new char[CaribbeanMap.HEIGHT][CaribbeanMap.WIDTH];
+        this.cost = 0;
+        this.leastCost = Integer.MAX_VALUE;
+        this.leastMap = new char[CaribbeanMap.HEIGHT][CaribbeanMap.WIDTH];
+        this.step = 0;
 
         Sign[][] signs = {
                 {Sign.PLUS, Sign.PLUS},
@@ -152,13 +158,11 @@ public class Backtracking implements Algorithm {
         return false;
     }
 
-    private int step = 0;
-
     private void solveRecursive(int n, Sign[][] elements) {
-        System.out.println(++step + " " + this.leastCost + " " + this.cost);
-//        step++;
-
         if (n == 1) {
+//            System.out.println(++step + " " + this.leastCost + " " + this.cost);
+            step++;
+
             Backtracking backTracking = new Backtracking(this.leastCost);
 
             CaribbeanMap mapCopy = new CaribbeanMap(this.caribbeanMap);
@@ -175,14 +179,8 @@ public class Backtracking implements Algorithm {
                     for (int x = 0; x < CaribbeanMap.WIDTH; x++) {
                         if (result[y][x] == MapSymbol.FREE.symbol)
                             this.leastMap[y][x] = MapSymbol.PATH.symbol;
-
-                        System.out.print(this.leastMap[y][x] + " ");
                     }
-                    System.out.println();
                 }
-
-                System.out.println(this.leastCost);
-//                this.caribbeanMap.print();
             }
         } else {
             for(int i = 0; i < n-1; i++) {

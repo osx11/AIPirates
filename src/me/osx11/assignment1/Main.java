@@ -3,17 +3,16 @@ package me.osx11.assignment1;
 import me.osx11.assignment1.a_star.Coord;
 import me.osx11.assignment1.a_star.Node;
 import me.osx11.assignment1.a_star.AStar;
-import me.osx11.assignment1.backtracking.Backtracking;
 import me.osx11.assignment1.mobs.*;
 
 public class Main {
-    private static final Algorithm algorithm = new Backtracking();
+    private static final Algorithm algorithm = new AStar();
 
     private static final int[] jack = {0, 0};
     private static final int[] davy = {6, 6};
     private static final int[] kraken = {7, 1};
     private static final int[] rock = {8, 7};
-    private static final int[] chest = {6, 0};
+    private static final int[] chest = {8, 0};
     private static final int[] tortuga = {8, 8};
 
     private static int finalCost;
@@ -34,10 +33,8 @@ public class Main {
         caribbeanMap.print();
         System.out.println();
 
-//        boolean result = algorithm.solve();
-//        recalculateFinalCost(algorithm.getFinalCost());
-
-        boolean result = false;
+        boolean result = algorithm.solve();
+        recalculateFinalCost(algorithm.getFinalCost());
 
         if (!result) {
             System.out.println("Chest is blocked. Trying to get to Tortuga first");
@@ -77,14 +74,20 @@ public class Main {
                 new Node(kraken[0]+1, kraken[1]+1),
                 new Node(kraken[0]-1, kraken[1]-1),
                 new Node(kraken[0]-1, kraken[1]+1),
-                new Node(kraken[0]+1, kraken[1]-1)
+                new Node(kraken[0]+1, kraken[1]-1),
         };
 
         int leastCost = Integer.MAX_VALUE;
         char[][] leastCostMap = new char[9][9];
 
         for (int i = 0; i < 4; i++) {
+            if (possibleEnds[i].coord.x > 8 || possibleEnds[i].coord.x < 0 || possibleEnds[i].coord.y > 8 || possibleEnds[i].coord.y < 0) continue;
             if (possibleEnds[i].coord.equals(new Coord(chest[0], chest[1]))) continue;
+
+            char startCell = caribbeanMap.map[possibleEnds[i].coord.y][possibleEnds[i].coord.x];
+            if (startCell != MapSymbol.FREE.symbol && startCell != MapSymbol.CHEST.symbol && startCell != MapSymbol.PATH.symbol) {
+                continue;
+            }
 
             CaribbeanMap mapCopy = new CaribbeanMap(caribbeanMap);
             mapCopy.start = new Node(tortuga[0], tortuga[1]);
@@ -100,6 +103,7 @@ public class Main {
                 mapCopy.end = new Node(chest[0], chest[1]);
                 mapCopy.removeKraken();
 
+                System.out.println("XUI XUI XUI " + mapCopy.map[7][5]);
                 result = algorithm.solve();
 
                 if (result) {

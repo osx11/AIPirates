@@ -46,7 +46,7 @@ public class AStar implements Algorithm {
 
         boolean dangerInCell = this.caribbeanMap.dangerMobs
                 .stream()
-                .anyMatch(mob -> currentCell == mob.icon || currentCell == MapSymbol.DANGER_ZONE.symbol);
+                .anyMatch(mob -> currentCell == mob.icon) || currentCell == MapSymbol.DANGER_ZONE.symbol;
 
         if (dangerInCell) return false;
 
