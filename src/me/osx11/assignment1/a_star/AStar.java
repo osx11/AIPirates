@@ -5,16 +5,14 @@ import me.osx11.assignment1.CaribbeanMap;
 import me.osx11.assignment1.Main;
 import me.osx11.assignment1.MapSymbol;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class AStar implements Algorithm {
     private int finalCost;
     private final Queue<Node> openList;
     private final List<Node> closeList;
     private CaribbeanMap caribbeanMap;
+    private List<Coord> path = new ArrayList<>();
 
     public AStar() {
         this.openList = new PriorityQueue<>();
@@ -159,18 +157,20 @@ public class AStar implements Algorithm {
     public void drawPath(char[][] maps, Node end) {
         if(end==null||maps==null) return;
 
-        finalCost = end.G;
+        this.finalCost = end.G;
 
-        while (end != null)
-        {
+        while (end != null) {
             Coord c = end.coord;
             if (maps[c.y][c.x] != MapSymbol.JACK.symbol) maps[c.y][c.x] = MapSymbol.PATH.symbol;
             end = end.parent;
+
+            this.path.add(c);
         }
     }
 
     public boolean solve() {
-        finalCost = 0;
+        this.path = new ArrayList<>();
+        this.finalCost = 0;
 
         // clean
         this.openList.clear();
@@ -196,7 +196,14 @@ public class AStar implements Algorithm {
             addNeighborNodeInOpen(current);
         }
 
-        finalCost = Integer.MAX_VALUE;
+        this.finalCost = Integer.MAX_VALUE;
         return false;
+    }
+
+    public List<Coord> getFinalPath() {
+        List<Coord> pathCopy = new ArrayList<>(this.path);
+        Collections.reverse(pathCopy);
+
+        return pathCopy.subList(1, pathCopy.size());
     }
 }

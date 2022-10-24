@@ -3,7 +3,11 @@ package me.osx11.assignment1;
 import me.osx11.assignment1.a_star.Coord;
 import me.osx11.assignment1.a_star.Node;
 import me.osx11.assignment1.a_star.AStar;
+import me.osx11.assignment1.backtracking.Backtracking;
 import me.osx11.assignment1.mobs.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     private static final Algorithm algorithm = new AStar();
@@ -16,6 +20,7 @@ public class Main {
     private static final int[] tortuga = {8, 8};
 
     private static int finalCost;
+    private static final List<Coord> path = new ArrayList<>();
 
     public static void main(String[] args) {
         CaribbeanMap caribbeanMap = new CaribbeanMap(
@@ -43,30 +48,36 @@ public class Main {
             result = algorithm.solve();
 
             if (!result) {
-                System.out.println("LOSE (Tortuga unreachable)");
+                System.out.println("Lose");
+                System.out.println("Tortuga unreachable");
                 caribbeanMap.print();
                 return;
             }
 
             recalculateFinalCost(algorithm.getFinalCost());
+            path.addAll(algorithm.getFinalPath());
+
             int tortugaToChestCost = findLeastKrakenKillPath(caribbeanMap);
 
             if (tortugaToChestCost < Integer.MAX_VALUE) {
                 System.out.println("Kraken was killed. Going to chest");
                 recalculateFinalCost(tortugaToChestCost);
             } else {
+                System.out.println("Lose");
                 System.out.println("Cannot kill Kraken or reach chest after it");
                 return;
             }
-        }
+        } else path.addAll(algorithm.getFinalPath());
 
         System.out.println();
+        System.out.println("Win");
         System.out.println("Final cost is " + finalCost);
         System.out.println("Note: In the below map @ denotes the path.");
         System.out.println("If the route passes through mob, obstacle, etc., this object is replaced by @");
         System.out.println("If Kraken was killed, it and it's danger zones are removed from map");
         System.out.println();
         caribbeanMap.print();
+        printPath();
     }
 
     private static int findLeastKrakenKillPath(CaribbeanMap caribbeanMap) {
@@ -79,6 +90,7 @@ public class Main {
 
         int leastCost = Integer.MAX_VALUE;
         char[][] leastCostMap = new char[9][9];
+        List<Coord> leastCostPath = null;
 
         for (int i = 0; i < 4; i++) {
             if (possibleEnds[i].coord.x > 8 || possibleEnds[i].coord.x < 0 || possibleEnds[i].coord.y > 8 || possibleEnds[i].coord.y < 0) continue;
@@ -97,6 +109,8 @@ public class Main {
             boolean result = algorithm.solve();
 
             if (result) {
+                List<Coord> path = algorithm.getFinalPath();
+
                 int cost = algorithm.getFinalCost();
 
                 mapCopy.start = new Node(possibleEnds[i].coord.x, possibleEnds[i].coord.y);
@@ -110,6 +124,9 @@ public class Main {
                     cost += algorithm.getFinalCost();
 
                     if (cost < leastCost) {
+                        path.addAll(algorithm.getFinalPath());
+                        leastCostPath = new ArrayList<>(path);
+
                         leastCost = cost;
 
                         for (int j = 0; j < mapCopy.map.length; j++)
@@ -122,6 +139,7 @@ public class Main {
 
         if (leastCost < Integer.MAX_VALUE) {
             caribbeanMap.setMap(leastCostMap);
+            path.addAll(leastCostPath);
         } else {
             System.out.println("CHEST UNREACHABLE");
         }
@@ -131,5 +149,9 @@ public class Main {
 
     private static void recalculateFinalCost(int newCost) {
         if (newCost != Integer.MAX_VALUE) finalCost += newCost;
+    }
+
+    private static void printPath() {
+        path.forEach(c -> System.out.print("[" + c.x + ", " + c.y + "] "));
     }
 }
