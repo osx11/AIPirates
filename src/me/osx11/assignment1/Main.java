@@ -6,10 +6,7 @@ import me.osx11.assignment1.a_star.AStar;
 import me.osx11.assignment1.backtracking.Backtracking;
 import me.osx11.assignment1.mobs.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +27,21 @@ public class Main {
 
         Algorithm algorithm = new AStar();
         CaribbeanMap caribbeanMap = generateMap();
+
+        long startTime = System.currentTimeMillis();
         solve(algorithm, caribbeanMap);
+        long endTime = System.currentTimeMillis();
+
+        saveExecutionTime(algorithm, endTime - startTime);
 
         algorithm = new Backtracking();
         caribbeanMap = generateMap();
+
+        startTime = System.currentTimeMillis();
         solve(algorithm, caribbeanMap);
+        endTime = System.currentTimeMillis();
+
+        saveExecutionTime(algorithm, endTime - startTime);
     }
 
     private static CaribbeanMap generateMap() {
@@ -233,6 +240,18 @@ public class Main {
             printWriter.println("Win");
             printWriter.println(finalCost);
             printWriter.println(getFormattedPath());
+        } catch (IOException e) {}
+    }
+
+    private static void saveExecutionTime(Algorithm algorithm, long executionTime) {
+        try (PrintWriter printWriter = new PrintWriter(
+                new FileOutputStream(
+                        algorithm instanceof AStar ? "outputAStar.txt" : "outputBacktracking.txt",
+                        true
+                )
+            )
+        ) {
+            printWriter.println(executionTime + "ms");
         } catch (IOException e) {}
     }
 }

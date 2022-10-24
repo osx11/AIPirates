@@ -2,7 +2,6 @@ package me.osx11.assignment1.a_star;
 
 import me.osx11.assignment1.Algorithm;
 import me.osx11.assignment1.CaribbeanMap;
-import me.osx11.assignment1.Main;
 import me.osx11.assignment1.MapSymbol;
 
 import java.util.*;
