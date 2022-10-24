@@ -16,7 +16,6 @@ public class Backtracking implements Algorithm {
     private int leastCost = Integer.MAX_VALUE;
     private char[][] leastMap = new char[CaribbeanMap.HEIGHT][CaribbeanMap.WIDTH];
     private CaribbeanMap caribbeanMap;
-    private int step = 0;
     private List<Coord> path = new ArrayList<>();
 
     public Backtracking() {}
@@ -49,10 +48,6 @@ public class Backtracking implements Algorithm {
         boolean dangerInCell = this.caribbeanMap.dangerMobs
                 .stream()
                 .anyMatch(mob -> currentCell == mob.icon) || currentCell == MapSymbol.DANGER_ZONE.symbol;
-
-        if (x == 5 && y == 7 && !dangerInCell) {
-//            this.caribbeanMap.print();
-        }
 
         return !dangerInCell;
     }
@@ -153,7 +148,6 @@ public class Backtracking implements Algorithm {
         this.cost = 0;
         this.leastCost = Integer.MAX_VALUE;
         this.leastMap = new char[CaribbeanMap.HEIGHT][CaribbeanMap.WIDTH];
-        this.step = 0;
         this.path = new ArrayList<>();
 
         Sign[][] signs = {
@@ -179,9 +173,6 @@ public class Backtracking implements Algorithm {
 
     private void solveRecursive(int n, Sign[][] elements) {
         if (n == 1) {
-//            System.out.println(++step + " " + this.leastCost + " " + this.cost);
-            step++;
-
             Backtracking backTracking = new Backtracking(this.leastCost);
 
             CaribbeanMap mapCopy = new CaribbeanMap(this.caribbeanMap);

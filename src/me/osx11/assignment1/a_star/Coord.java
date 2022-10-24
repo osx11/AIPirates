@@ -9,6 +9,10 @@ public class Coord {
         this.y = y;
     }
 
+    public String getFormatted() {
+        return "[" + this.x + ", " + this.y + "]";
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;

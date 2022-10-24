@@ -6,24 +6,39 @@ import me.osx11.assignment1.a_star.AStar;
 import me.osx11.assignment1.backtracking.Backtracking;
 import me.osx11.assignment1.mobs.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    private static final Algorithm algorithm = new AStar();
 
-    private static final int[] jack = {0, 0};
-    private static final int[] davy = {6, 6};
-    private static final int[] kraken = {7, 1};
-    private static final int[] rock = {8, 7};
-    private static final int[] chest = {8, 0};
-    private static final int[] tortuga = {8, 8};
+    private static int[] jack = {0, 0};
+    private static int[] davy = {6, 6};
+    private static int[] kraken = {7, 1};
+    private static int[] rock = {8, 7};
+    private static int[] chest = {8, 0};
+    private static int[] tortuga = {8, 8};
 
-    private static int finalCost;
-    private static final List<Coord> path = new ArrayList<>();
+    private static int finalCost = 0;
+    private static List<Coord> path = new ArrayList<>();
 
     public static void main(String[] args) {
-        CaribbeanMap caribbeanMap = new CaribbeanMap(
+        parseInput();
+
+        Algorithm algorithm = new AStar();
+        CaribbeanMap caribbeanMap = generateMap();
+        solve(algorithm, caribbeanMap);
+
+        algorithm = new Backtracking();
+        caribbeanMap = generateMap();
+        solve(algorithm, caribbeanMap);
+    }
+
+    private static CaribbeanMap generateMap() {
+        return new CaribbeanMap(
                 new Jack(jack[0], jack[1]),
                 new Chest(chest[0], chest[1]),
                 new Tortuga(tortuga[0], tortuga[1]),
@@ -33,6 +48,11 @@ public class Main {
                 new Node(jack[0], jack[1]),
                 new Node(chest[0], chest[1])
         );
+    }
+
+    private static void solve(Algorithm algorithm, CaribbeanMap caribbeanMap) {
+        finalCost = 0;
+        path = new ArrayList<>();
 
         algorithm.setMap(caribbeanMap);
         caribbeanMap.print();
@@ -50,6 +70,8 @@ public class Main {
             if (!result) {
                 System.out.println("Lose");
                 System.out.println("Tortuga unreachable");
+
+                reportLose(algorithm);
                 caribbeanMap.print();
                 return;
             }
@@ -57,7 +79,7 @@ public class Main {
             recalculateFinalCost(algorithm.getFinalCost());
             path.addAll(algorithm.getFinalPath());
 
-            int tortugaToChestCost = findLeastKrakenKillPath(caribbeanMap);
+            int tortugaToChestCost = findLeastKrakenKillPath(algorithm, caribbeanMap);
 
             if (tortugaToChestCost < Integer.MAX_VALUE) {
                 System.out.println("Kraken was killed. Going to chest");
@@ -65,6 +87,8 @@ public class Main {
             } else {
                 System.out.println("Lose");
                 System.out.println("Cannot kill Kraken or reach chest after it");
+
+                reportLose(algorithm);
                 return;
             }
         } else path.addAll(algorithm.getFinalPath());
@@ -78,9 +102,11 @@ public class Main {
         System.out.println();
         caribbeanMap.print();
         printPath();
+
+        reportWin(algorithm);
     }
 
-    private static int findLeastKrakenKillPath(CaribbeanMap caribbeanMap) {
+    private static int findLeastKrakenKillPath(Algorithm algorithm, CaribbeanMap caribbeanMap) {
         Node[] possibleEnds = {
                 new Node(kraken[0]+1, kraken[1]+1),
                 new Node(kraken[0]-1, kraken[1]-1),
@@ -117,7 +143,6 @@ public class Main {
                 mapCopy.end = new Node(chest[0], chest[1]);
                 mapCopy.removeKraken();
 
-                System.out.println("XUI XUI XUI " + mapCopy.map[7][5]);
                 result = algorithm.solve();
 
                 if (result) {
@@ -152,6 +177,62 @@ public class Main {
     }
 
     private static void printPath() {
-        path.forEach(c -> System.out.print("[" + c.x + ", " + c.y + "] "));
+        System.out.println(getFormattedPath());
+    }
+
+    private static String getFormattedPath() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        path.forEach(c -> {
+            stringBuilder.append(c.getFormatted());
+            stringBuilder.append(" ");
+        });
+
+        return stringBuilder.toString();
+    }
+
+    private static void parseInput() {
+        try(BufferedReader bf = new BufferedReader(new FileReader("input.txt"))) {
+            String data = bf.readLine();
+            String[] dataSplit = data.split(" ");
+
+            for (int i = 0; i < dataSplit.length; i++) {
+                String d = dataSplit[i];
+                d = d.replace("[", "");
+                d = d.replace("]", "");
+
+                int x = Integer.parseInt(d.split(",")[0]);
+                int y = Integer.parseInt(d.split(",")[1]);
+
+                switch (i) {
+                    case 0:
+                        jack = new int[]{x, y};
+                    case 1:
+                        davy = new int[]{x, y};
+                    case 2:
+                        kraken = new int[]{x, y};
+                    case 3:
+                        rock = new int[]{x, y};
+                    case 4:
+                        chest = new int[]{x, y};
+                    case 5:
+                        tortuga = new int[]{x, y};
+                }
+            }
+        } catch (IOException e) {}
+    }
+
+    private static void reportLose(Algorithm algorithm) {
+        try (PrintWriter printWriter = new PrintWriter(algorithm instanceof AStar ? "outputAStar.txt" : "outputBacktracking.txt")) {
+            printWriter.println("Lose");
+        } catch (IOException e) {}
+    }
+
+    private static void reportWin(Algorithm algorithm) {
+        try (PrintWriter printWriter = new PrintWriter(algorithm instanceof AStar ? "outputAStar.txt" : "outputBacktracking.txt")) {
+            printWriter.println("Win");
+            printWriter.println(finalCost);
+            printWriter.println(getFormattedPath());
+        } catch (IOException e) {}
     }
 }
