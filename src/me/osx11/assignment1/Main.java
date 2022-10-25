@@ -28,20 +28,20 @@ public class Main {
         Algorithm algorithm = new AStar();
         CaribbeanMap caribbeanMap = generateMap();
 
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         solve(algorithm, caribbeanMap);
-        long endTime = System.currentTimeMillis();
+        long endTime = System.nanoTime();
 
-        saveExecutionTime(algorithm, endTime - startTime);
+        saveExecutionTime(algorithm, ((float)(endTime - startTime)) / 1000000);
 
         algorithm = new Backtracking();
         caribbeanMap = generateMap();
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         solve(algorithm, caribbeanMap);
-        endTime = System.currentTimeMillis();
+        endTime = System.nanoTime();
 
-        saveExecutionTime(algorithm, endTime - startTime);
+        saveExecutionTime(algorithm, ((float)(endTime - startTime)) / 1000000);
     }
 
     private static CaribbeanMap generateMap() {
@@ -243,7 +243,7 @@ public class Main {
         } catch (IOException e) {}
     }
 
-    private static void saveExecutionTime(Algorithm algorithm, long executionTime) {
+    private static void saveExecutionTime(Algorithm algorithm, float executionTime) {
         try (PrintWriter printWriter = new PrintWriter(
                 new FileOutputStream(
                         algorithm instanceof AStar ? "outputAStar.txt" : "outputBacktracking.txt",
