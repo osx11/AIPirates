@@ -29,7 +29,7 @@ public class Main {
         CaribbeanMap caribbeanMap = generateMap();
 
         long startTime = System.nanoTime();
-        solve(algorithm, caribbeanMap);
+        solve(algorithm, caribbeanMap, true);
         long endTime = System.nanoTime();
 
         saveExecutionTime(algorithm, ((float)(endTime - startTime)) / 1000000);
@@ -38,7 +38,7 @@ public class Main {
         caribbeanMap = generateMap();
 
         startTime = System.nanoTime();
-        solve(algorithm, caribbeanMap);
+        solve(algorithm, caribbeanMap, false);
         endTime = System.nanoTime();
 
         saveExecutionTime(algorithm, ((float)(endTime - startTime)) / 1000000);
@@ -57,12 +57,14 @@ public class Main {
         );
     }
 
-    private static void solve(Algorithm algorithm, CaribbeanMap caribbeanMap) {
+    private static void solve(Algorithm algorithm, CaribbeanMap caribbeanMap, boolean printDefaultMap) {
         finalCost = 0;
         path = new ArrayList<>();
 
         algorithm.setMap(caribbeanMap);
-        caribbeanMap.print();
+
+        if (printDefaultMap)
+            caribbeanMap.print();
         System.out.println();
 
         boolean result = algorithm.solve();
