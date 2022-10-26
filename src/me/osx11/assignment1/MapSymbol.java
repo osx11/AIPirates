@@ -1,7 +1,7 @@
 package me.osx11.assignment1;
 
 public enum MapSymbol {
-    FREE('·'),
+    FREE('~'),
     JACK('J'),
     DAVY('D'),
     KRAKEN('K'),

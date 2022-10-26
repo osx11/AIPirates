@@ -6,7 +6,6 @@ import me.osx11.assignment1.MapSymbol;
 import me.osx11.assignment1.a_star.Coord;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Backtracking implements Algorithm {
