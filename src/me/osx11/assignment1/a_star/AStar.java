@@ -26,14 +26,10 @@ public class AStar implements Algorithm {
     public int getFinalCost() { return finalCost; }
 
     /**
-     * Determine whether the node is the final node
-     */
-    public boolean isEndNode(Coord end, Coord coord) {
-        return end.equals(coord);
-    }
-
-    /**
-     * Determine whether the node can be placed in the Open list
+     * Determine if the node contains danger to determine if it can be placed in Open List
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return true if coordinate can be added to open list (means there is not danger in the cell), otherwise false
      */
     public boolean canAddNodeToOpen(int x, int y) {
         if (x < 0 || x >= CaribbeanMap.WIDTH || y < 0 || y >= CaribbeanMap.HEIGHT) return false;
@@ -54,14 +50,19 @@ public class AStar implements Algorithm {
     }
 
     /**
-     * Determine whether the coordinates are in the close table
+     * Determine if the coordinate is in close list
+     * @param coord coordinate to check
+     * @return true if coordinate is in close list, otherwise false
      */
     public boolean isCoordInClose(Coord coord) {
         return coord != null && isCoordInClose(coord.x, coord.y);
     }
 
     /**
-     * Determine whether the coordinates are in the close table
+     * Determine if the coordinate is in close list
+     * @param x x coordinate to check
+     * @param y y coordinate to check
+     * @return true if coordinate is in close list, otherwise false
      */
     public boolean isCoordInClose(int x, int y) {
         if (this.closeList.isEmpty()) return false;
@@ -75,7 +76,13 @@ public class AStar implements Algorithm {
         return false;
     }
 
-    public int calcH(Coord end,Coord coord) {
+    /**
+     * Calculates heuristic distance between two coordinates
+     * @param end first coordinate
+     * @param coord second coordinate
+     * @return heuristic distance
+     */
+    public int calcH(Coord end, Coord coord) {
         return Math.abs(end.x - coord.x) + Math.abs(end.y - coord.y);
     }
 
@@ -93,36 +100,32 @@ public class AStar implements Algorithm {
     }
 
     /**
-     * Add all neighbor nodes to the open table
+     * Add all neighbor nodes (left, up, right, down, top left, top right, bottom left, bottom right) to the open table
+     * @param current current node
      */
     public void addNeighborNodeInOpen(Node current)
     {
         int x = current.coord.x;
         int y = current.coord.y;
-        // left
+
         addNeighborNodeInOpen(current, x - 1, y);
-        // up
         addNeighborNodeInOpen(current, x, y - 1);
-        // right
         addNeighborNodeInOpen(current, x + 1, y);
-        // down
         addNeighborNodeInOpen(current, x, y + 1);
-        // top left
         addNeighborNodeInOpen(current, x - 1, y - 1);
-        // top right
         addNeighborNodeInOpen(current, x + 1, y - 1);
-        // bottom right
         addNeighborNodeInOpen(current, x + 1, y + 1);
-        // bottom left
         addNeighborNodeInOpen(current, x - 1, y + 1);
     }
 
     /**
      * Add a neighbor node to the open table
+     * @param current node to add
+     * @param x x coordinate of the node
+     * @param y y coordinate of the node
      */
     public void addNeighborNodeInOpen(Node current, int x, int y) {
-        if (canAddNodeToOpen(x, y))
-        {
+        if (canAddNodeToOpen(x, y)) {
             Node end = this.caribbeanMap.end;
             Coord coord = new Coord(x, y);
             int G = current.G + 1; // Calculate the G value of the adjacent node
@@ -130,21 +133,17 @@ public class AStar implements Algorithm {
             if (child == null)
             {
                 int H=calcH(end.coord,coord); // calculate H value
-                if(isEndNode(end.coord,coord))
-                {
+
+                if (end.coord.equals(coord)) {
                     child=end;
                     child.parent=current;
                     child.G=G;
                     child.H=H;
-                }
-                else
-                {
+                } else {
                     child = new Node(coord, current, G, H);
                 }
                 this.openList.add(child);
-            }
-            else if (child.G > G)
-            {
+            } else if (child.G > G) {
                 child.G = G;
                 child.parent = current;
                 // readjust the heap
@@ -153,20 +152,25 @@ public class AStar implements Algorithm {
         }
     }
 
-    public void drawPath(char[][] maps, Node end) {
-        if(end==null||maps==null) return;
+    /**
+     * Draw the final path on the map
+     */
+    public void drawPath() {
+        this.finalCost = this.caribbeanMap.end.G;
 
-        this.finalCost = end.G;
-
-        while (end != null) {
-            Coord c = end.coord;
-            if (maps[c.y][c.x] != MapSymbol.JACK.symbol) maps[c.y][c.x] = MapSymbol.PATH.symbol;
-            end = end.parent;
+        while (this.caribbeanMap.end != null) {
+            Coord c = this.caribbeanMap.end.coord;
+            if (this.caribbeanMap.map[c.y][c.x] != MapSymbol.JACK.symbol)
+                this.caribbeanMap.map[c.y][c.x] = MapSymbol.PATH.symbol;
+            this.caribbeanMap.end = this.caribbeanMap.end.parent;
 
             this.path.add(c);
         }
     }
 
+    /**
+     * Common method to solve the task
+     */
     public boolean solve() {
         this.path = new ArrayList<>();
         this.finalCost = 0;
@@ -181,12 +185,12 @@ public class AStar implements Algorithm {
     }
 
     /**
-     * Move the current node
+     * Move the current node (means move the Jack's position)
      */
     public boolean moveNodes() {
         while (!this.openList.isEmpty()) {
             if (isCoordInClose(this.caribbeanMap.end.coord)) {
-                drawPath(this.caribbeanMap.map, this.caribbeanMap.end);
+                drawPath();
                 return true;
             }
 
@@ -199,6 +203,9 @@ public class AStar implements Algorithm {
         return false;
     }
 
+    /**
+     * @return array of coordinates with path
+     */
     public List<Coord> getFinalPath() {
         List<Coord> pathCopy = new ArrayList<>(this.path);
         Collections.reverse(pathCopy);
